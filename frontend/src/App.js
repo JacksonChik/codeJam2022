@@ -4,8 +4,6 @@ import Form from './Form/Form';
 import { List, ListItem, ListItemText } from '@material-ui/core';
 import GoogleMapReact from 'google-map-react';
 import { BsFillFlagFill } from 'react-icons/bs';
-import LineTo from 'react-lineto'
-
 
 const PointMarker = ({ text }) => {return (<div className={`${text}`} style={{ color: 'red' }}> {text} <BsFillFlagFill size={30}/></div>)};
 const defaultProps = {
@@ -43,7 +41,6 @@ const App = () => {
           text="End"  
           className="End"
         />
-        {endLat ? <LineTo from="Start" to="End" /> : <></>}
       </GoogleMapReact>
     </div>
         </div>
