@@ -3,6 +3,9 @@ import GoogleMapReact from 'google-map-react';
 import { BsFillFlagFill } from 'react-icons/bs';
 import LineTo from 'react-lineto'
 
+var randomColor = require('randomcolor'); 
+var color = randomColor();
+
 const PointMarker = ({ text }) => {return (<div className={`${text}`} style={{ color: 'red' }}> {text} <BsFillFlagFill/></div>)};
 
 export const MyMap = () => {
