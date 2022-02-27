@@ -15,14 +15,15 @@ const getFormData = (obj) => {
 const getResult = (setState, req) => async() => {
     try{
         console.log("request sent");
-        const { res } = await axios({
+        axios({
             method: 'post',
             url: 'http://localhost:9090/trip/plan_trip.do',
             data: getFormData(req)
+          }).then((res) => {
+            console.log("response received: ", res);
+            setState(res.data);
           });
-        console.log("response received: ", res);
-        setState(res.data);
-        console.log(res.data)
+        
     } catch (error) {
         console.log(error)
     }
