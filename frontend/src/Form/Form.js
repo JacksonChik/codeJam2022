@@ -6,6 +6,11 @@ import moment from 'moment'
 import axios from 'axios';
 
 
+function getFormData(object) {
+    const formData = new FormData();
+    Object.keys(object).forEach(key => formData.append(key, object[key]));
+    return formData;
+}
 
 const getResult = (setState, req) => async() => {
     try{
@@ -13,13 +18,7 @@ const getResult = (setState, req) => async() => {
         const { data } = await axios({
             method: 'post',
             url: 'http://localhost:9090/trip/plan_trip.do',
-            data: {
-                TripId: req.TripId,
-                StartLatitude: req.StartLatitude,
-                StartLongitude: req.StartLongitude,
-                StartTime: req.StartTime,
-                MaxDestTime: req.MaxDestTime
-            }
+            data: getFormData(req)
           });
         console.log("response received: ", data);
         setState(data);
