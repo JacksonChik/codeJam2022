@@ -1,19 +1,7 @@
 import './App.css';
-import axios from 'axios';
 import { useState } from 'react';
 import { MyMap } from './Map/MyMap';
-const url = 'http://localhost:9090/';
-
-const getResult = (setState) => async() => {
-    try{
-        console.log("request sent");
-        const { data } = await axios.get(url);
-        console.log("response received: ", data);
-        setState(data);
-    } catch (error) {
-        console.log(error)
-    }
-}
+import Form from './Form/Form';
 
 const App = () => {
   const [result, setResult] = useState(["no result"]);
@@ -24,9 +12,10 @@ const App = () => {
       {result}
       <MyMap/>
       </div>  
-      <button onClick={getResult(setResult)} style={{margin:'20px'}}>
+      <Form setState={setResult}/>
+      {/* <button onClick={getResult(setResult, req)} style={{margin:'20px'}}>
         get result
-      </button>
+      </button> */}
     </div>
   );
 }
