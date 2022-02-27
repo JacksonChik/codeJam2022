@@ -1,5 +1,5 @@
 # codeJam2022
 
-This is a trucker's trip planner tool.
+A *very cool* vehicle routing web app implemented with React and Spring Boot(JDBC + MySQL). Dynamic programming(weighted interval scheduling) is used.
 
-Team members: Jackson Chik, Kevin Xu, Chris Zhao, Jianmo Li
+Team members(BitOcean): Jackson Chik, Kevin Xu, Chris Zhao, Jianmo Li
