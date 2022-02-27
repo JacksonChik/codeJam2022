@@ -10,7 +10,17 @@ import axios from 'axios';
 const getResult = (setState, req) => async() => {
     try{
         console.log("request sent");
-        const { data } = await axios.post('http://localhost:9090/trip/plan_trip.do', req);
+        const { data } = await axios({
+            method: 'post',
+            url: 'http://localhost:9090/trip/plan_trip.do',
+            data: {
+                TripId: req.TripId,
+                StartLatitude: req.StartLatitude,
+                StartLongitude: req.StartLongitude,
+                StartTime: req.StartTime,
+                MaxDestTime: req.MaxDestTime
+            }
+          });
         console.log("response received: ", data);
         setState(data);
     } catch (error) {
