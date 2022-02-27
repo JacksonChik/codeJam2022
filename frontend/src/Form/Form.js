@@ -30,7 +30,7 @@ const getResult = (setState, req) => async() => {
     }
 }
 
-export const Form = ( {setState} ) => {
+export const Form = ( {setState, setLat, setLng} ) => {
     const emptyForm ={
         TripId: -1,
         StartLatitude: 0,
@@ -57,8 +57,8 @@ export const Form = ( {setState} ) => {
             <form autoComplete="off" noValidate c onSubmit={handleSubmit}>
             <Typography variant="h6">Input trip plan request</Typography>
             <TextField style={{margin:'10px'}} name="TripId" variant="outlined" label="Trip ID"  value={formData.TripId} onChange={(e)=>{setFormData({ ...formData, TripId: e.target.value })}}/>
-            <TextField style={{margin:'10px'}} name="StartLatitude" variant="outlined" label="Start Latitude" value={formData.StartLatitude} onChange={(e)=>setFormData({ ...formData, StartLatitude: e.target.value })}/>
-            <TextField style={{margin:'10px'}} name="StartLongitude" variant="outlined" label="Start Longitude"  value={formData.StartLongitude} onChange={(e)=>setFormData({ ...formData, StartLongitude: e.target.value })}/>
+            <TextField style={{margin:'10px'}} name="StartLatitude" variant="outlined" label="Start Latitude" value={formData.StartLatitude} onChange={(e)=>{setLat(e.target.value);setFormData({ ...formData, StartLatitude: e.target.value })}}/>
+            <TextField style={{margin:'10px'}} name="StartLongitude" variant="outlined" label="Start Longitude"  value={formData.StartLongitude} onChange={(e)=>{setLng(e.target.value);setFormData({ ...formData, StartLongitude: e.target.value })}}/>
 
             <MuiPickersUtilsProvider utils={MomentUtils}>
                 <DateTimePicker style={{margin:'10px'}} label="Start Time" inputVariant="outlined" value={formData.StartTime} onChange={(date) => setFormData({ ...formData, StartTime: moment(date._d.toUTCString()).format("YYYY-MM-DD HH:mm:ss") }) } />
