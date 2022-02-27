@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
-import {DatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
+import {DateTimePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment'
 import axios from 'axios';
@@ -10,7 +10,7 @@ import axios from 'axios';
 const getResult = (setState, req) => async() => {
     try{
         console.log("request sent");
-        const { data } = await axios.post('http://localhost:9090/plan_trip.do', req);
+        const { data } = await axios.post('http://localhost:9090/trip/plan_trip.do', req);
         console.log("response received: ", data);
         setState(data);
     } catch (error) {
@@ -49,8 +49,8 @@ export const Form = ( {setState} ) => {
             <TextField style={{margin:'10px'}} name="StartLongitude" variant="outlined" label="Start Longitude"  value={formData.StartLongitude} onChange={(e)=>setFormData({ ...formData, StartLongitude: e.target.value })}/>
 
             <MuiPickersUtilsProvider utils={MomentUtils}>
-                <DatePicker style={{margin:'10px'}} label="Start Time" inputVariant="outlined" value={formData.StartTime} onChange={(date) => setFormData({ ...formData, startDate: moment(date).format("YYYY-MM-DD HH:mm:ss") }) } />
-                <DatePicker style={{margin:'10px'}} label="Max Dest Time" inputVariant="outlined" value={formData.MaxDestTime} onChange={(date) => setFormData({ ...formData, endDate: moment(date).format("YYYY-MM-DD HH:mm:ss") }) } />
+                <DateTimePicker style={{margin:'10px'}} label="Start Time" inputVariant="outlined" value={formData.StartTime} onChange={(date) => setFormData({ ...formData, StartTime: moment(date._d.toUTCString()).format("YYYY-MM-DD HH:mm:ss") }) } />
+                <DateTimePicker style={{margin:'10px'}} label="Max Dest Time" inputVariant="outlined" value={formData.MaxDestTime} onChange={(date) => setFormData({ ...formData, MaxDestTime: moment(date._d.toUTCString()).format("YYYY-MM-DD HH:mm:ss") }) } />
             </MuiPickersUtilsProvider>
 
             <Button variant="container" color="primary" size="large" type="submit" onClick={getResult(setState, formData)} fullWidth>Submit</Button>
