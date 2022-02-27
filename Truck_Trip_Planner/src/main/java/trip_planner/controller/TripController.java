@@ -37,7 +37,7 @@ public class TripController extends BaseController{
 		
 		if(result!=null) {
 			rr = new ResponseResult<List<Load>>(SUCCESS);
-			//rr.setData(result);
+			rr.setData(result);
 		}else {
 			rr = new ResponseResult<List<Load>>(0);
 		}

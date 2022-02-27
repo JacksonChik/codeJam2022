@@ -3,13 +3,18 @@ package trip_planner.entity;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Vertex implements Serializable{
 
 	private static final long serialVersionUID = 7256684752256780461L;
 	
-	private final double latitude;
-    private final double longitude;
+	private final Double latitude;
+    private final Double longitude;
 
+    
     public Vertex(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;

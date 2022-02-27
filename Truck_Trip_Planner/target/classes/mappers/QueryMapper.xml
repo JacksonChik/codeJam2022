@@ -12,7 +12,8 @@ load_id, amount
 FROM
 Truckload
 WHERE
-pickup_date_time>#{startDateTime}
+pickup_date_time>#{startDateTime} 
+AND pickup_date_time&#60;#{maxDestTime}
 </select>
 
 <!-- Input a number indicate the year and the month, and get back the list of money in the selected month -->

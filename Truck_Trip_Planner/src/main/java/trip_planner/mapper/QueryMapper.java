@@ -11,7 +11,7 @@ public interface QueryMapper {
 	 * 
 	 * @return a list of all the money spent at that specific date
 	 */
-	List<Load> findValidLoadsByStart(LocalDateTime startDateTime);
+	List<Load> findValidLoadsByStart(LocalDateTime startDateTime, LocalDateTime maxDestTime);
 	
 	/**
 	 * @return a list of all the money spent at that specific date

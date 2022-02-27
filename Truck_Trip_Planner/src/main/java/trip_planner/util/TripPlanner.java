@@ -1,5 +1,6 @@
 package trip_planner.util;
 
+
 import java.util.*;
 
 import trip_planner.entity.Load;
@@ -14,8 +15,6 @@ public class TripPlanner {
         for (Load l : loads){
             allAvailableLoads.add(new Load(l));
         }
-        // sort the loads from earliest pickup time
-        this.allAvailableLoads.sort((o1, o2) -> o1.arriveTime.compareTo(o2.arriveTime));
     }
 
     public static LocalDateTime plusTime(LocalDateTime dateTime, double hours){
@@ -32,12 +31,18 @@ public class TripPlanner {
     public Integer[] plan(Vertex start, LocalDateTime startTime, LocalDateTime maxDestTime){
         // find loads that are within the queried time window
         List<Load> loadsToConsider = new ArrayList<>();
+        System.out.println("--Find available loads--");
+        long time = System.currentTimeMillis();
         for (Load l : allAvailableLoads){
             if (plusTime(startTime, Vertex.hours(l.start, start)).compareTo(l.pickupTime) <= 0
             && maxDestTime.compareTo(l.arriveTime) >= 0)
                 loadsToConsider.add(l);
         }
+        // sort the loads by finishing time in ascending order
+        loadsToConsider.sort((o1, o2) -> o1.arriveTime.compareTo(o2.arriveTime));
 
+        System.out.println("Available loads: " + loadsToConsider.size());
+        System.out.println("time taken: " + (System.currentTimeMillis() - time));
         // find the last load of the optimal trip
         Load curLoad = find_optimal(loadsToConsider, start, startTime, maxDestTime);
         if (curLoad == null) return new Integer[0];
@@ -55,66 +60,8 @@ public class TripPlanner {
         return loadArray;
     }
 
-    /**
-     *
-     * @param loads
-     * @param start
-     * @param end
-     * @param time
-     * @return index of the earliest load that the trucker can take
-     */
-    public int searchEarliestLoad(List<Load> loads, int start, int end, LocalDateTime time){
-        if (start <= end){
-            int e = (start + end) / 2;
-            if (loads.get(e).pickupTime.compareTo(time) > 0){
-                return searchEarliestLoad(loads, start, e-1, time);
-            }
-            else if (loads.get(e).pickupTime.compareTo(time) < 0){
-                return searchEarliestLoad(loads, e+1, end, time);
-            }
-            return e;
-        }
-
-        return start; // return the later load
-    }
-
-    public int searchLatestLoad(List<Load> loads, int start, int end, LocalDateTime time){
-        if (start <= end){
-            int e = (start + end) / 2;
-            if (loads.get(e).arriveTime.compareTo(time) > 0){
-                return searchLatestLoad(loads, start, e-1, time);
-            }
-            else if (loads.get(e).arriveTime.compareTo(time) < 0){
-                return searchLatestLoad(loads, e+1, end, time);
-            }
-            return e;
-        }
-        return end; // return the earlier load
-    }
-
-    public Load find_optimal(List<Load> loads, Vertex start, LocalDateTime startTime, LocalDateTime destTime){
-    	if (loads.size() == 0) return null;
-    	
-        List<Vertex> vertexList = new ArrayList<>();
-        for (Load l : loads){
-            vertexList.add(l.start);
-            vertexList.add(l.destination);
-        }
-        vertexList.add(start);
-        Map<Set<Vertex>, Double> hours = new HashMap<>();
-        Map<Set<Vertex>, Double> costs = new HashMap<>();
-        for (int i=0; i<vertexList.size(); i++){
-            for (int j=0; j<=i; j++){
-                Set<Vertex> pair = new HashSet<>();
-                Vertex v1 = vertexList.get(i);
-                Vertex v2 = vertexList.get(j);
-                pair.add(v1);
-                pair.add(v2);
-                hours.put(pair, Vertex.hours(v1, v2));
-                costs.put(pair, Vertex.fuelCost(v1, v2));
-            }
-        }
-
+    public Load __find_optimal(List<Load> loads, Vertex start, LocalDateTime startTime, LocalDateTime destTime){
+        if (loads.size() == 0) return null;
         /*
         computer p(i). p(i) = index of load with latest (arrival time + time to the vertex of this load)
          */
@@ -124,10 +71,7 @@ public class TripPlanner {
             int lastCompatible = -1;
             //LocalDateTime latestArrivalTime = null;
             for (int j=i-1; j>=0; j--){
-                Set<Vertex> pair = new HashSet<>();
-                pair.add(loads.get(i).start);
-                pair.add(loads.get(j).destination);
-                LocalDateTime arrivalTime = plusTime(loads.get(j).arriveTime, hours.get(pair));
+                LocalDateTime arrivalTime = plusTime(loads.get(j).arriveTime, Vertex.hours(loads.get(i).start, loads.get(j).destination));
                 if (arrivalTime.compareTo(loads.get(i).pickupTime) <= 0){
                     lastCompatible = j;
                     break;
@@ -143,20 +87,18 @@ public class TripPlanner {
         for (int i=0; i<loads.size(); i++){
             Load curLoad = loads.get(i);
             double curNetProfit = curLoad.profit;
-            Set<Vertex> pair = new HashSet<>();
-            pair.add(curLoad.start);
             if(p[i] == -1 || lastLoadArray[p[i]+1] == null){
-                pair.add(start);
+                curNetProfit -= Vertex.fuelCost(curLoad.start, start);
             } else{
-                pair.add(lastLoadArray[p[i]+1].destination);
+                curNetProfit -= Vertex.fuelCost(curLoad.start, lastLoadArray[p[i]+1].destination);
                 curNetProfit += opt[p[i]+1];
             }
-            curNetProfit -= costs.get(pair);
+            curNetProfit -= Vertex.fuelCost(curLoad.start, curLoad.destination);
 
             if (curNetProfit > opt[i]){
                 opt[i+1] = curNetProfit;
                 lastLoadArray[i+1] = curLoad;
-                curLoad.lastLoad = p[i] == -1? null : loads.get(p[i]);
+                curLoad.lastLoad = lastLoadArray[p[i]+1];
             }
             else{
                 opt[i+1] = opt[i];
@@ -167,5 +109,78 @@ public class TripPlanner {
         return lastLoadArray[lastLoadArray.length-1];
     }
 
+    public Load find_optimal(List<Load> loads, Vertex start, LocalDateTime startTime, LocalDateTime destTime){
+        long time = System.currentTimeMillis();
+        System.out.println("Trip Finding Started");
+        System.out.println("time taken:" + (System.currentTimeMillis() - time));
+        time = System.currentTimeMillis();
+        System.out.println("--Fill list P_i--");
+        if (loads.size() == 0) return null;
+        /*
+        computer p(i). p(i) = index of load with latest (arrival time + time to the vertex of this load)
+         */
+        int[] p = new int[loads.size()];
+        p[0] = -1;
+        for (int i=1; i<p.length; i++){
+            int lastCompatible = -1;
+            //LocalDateTime latestArrivalTime = null;
+            for (int j=i-1; j>=0; j--){
+                LocalDateTime arrivalTime = plusTime(loads.get(j).arriveTime, Vertex.hours(loads.get(i).start, loads.get(j).destination));
+                if (arrivalTime.compareTo(loads.get(i).pickupTime) <= 0){
+                    lastCompatible = j;
+                    break;
+                }
+            }
+            p[i] = lastCompatible;
+        }
+
+        System.out.println("time taken:" + (System.currentTimeMillis() - time));
+        time = System.currentTimeMillis();
+        System.out.println("--Fill lists Opt_j and LL_j--");
+        double[] opt = new double[loads.size()+1];
+        Load[] lastLoadArray = new Load[loads.size()+1];
+        opt[0] = 0;
+        lastLoadArray[0] = null;
+        for (int i=0; i<loads.size(); i++){
+            Load curLoad = loads.get(i);
+            double curNetProfit = curLoad.profit;
+            if(p[i] == -1 || lastLoadArray[p[i]+1] == null){
+                curNetProfit -= Vertex.fuelCost(curLoad.start, start);
+            } else{
+                curNetProfit -= Vertex.fuelCost(curLoad.start, lastLoadArray[p[i]+1].destination);
+                curNetProfit += opt[p[i]+1];
+            }
+            curNetProfit -= Vertex.fuelCost(curLoad.start, curLoad.destination);
+
+            if (curNetProfit > opt[i]){
+                opt[i+1] = curNetProfit;
+                lastLoadArray[i+1] = curLoad;
+                curLoad.lastLoad = lastLoadArray[p[i]+1];
+            }
+            else{
+                opt[i+1] = opt[i];
+                lastLoadArray[i+1] = lastLoadArray[i];
+            }
+        }
+        System.out.println("time taken:" + (System.currentTimeMillis() - time));
+        return lastLoadArray[lastLoadArray.length-1];
+    }
+
+    public double getProfit(Vertex start, Load lastLoad){
+        Load curLoad = lastLoad;
+        double netProfit = 0;
+        while(true){
+            netProfit += curLoad.profit;
+            if (curLoad.lastLoad != null){
+                netProfit -= Vertex.fuelCost(curLoad.start, curLoad.lastLoad.destination);
+                curLoad = curLoad.lastLoad;
+            }
+            else {
+                break;
+            }
+        }
+        netProfit -= Vertex.fuelCost(start, curLoad.start);
+        return netProfit;
+    }
 }
 

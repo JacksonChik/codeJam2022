@@ -27,7 +27,7 @@ public class TripServiceImpl implements ITripService{
 	@Override
 	public List<Load> findBestValidLoads(Trucker trucker) {
 		
-		List<Load> possibleLoads = queryMapper.findValidLoadsByStart(trucker.getStartTime());
+		List<Load> possibleLoads = queryMapper.findValidLoadsByStart(trucker.getStartTime(), trucker.getMaxDestTime());
 		
 		System.out.println(possibleLoads.size());
 		System.out.println(possibleLoads.get(0));
