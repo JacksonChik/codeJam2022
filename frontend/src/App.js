@@ -2,20 +2,19 @@ import './App.css';
 import { useState } from 'react';
 import { MyMap } from './Map/MyMap';
 import Form from './Form/Form';
+import { ResultList } from './ResultList/ResultList';
+
 
 const App = () => {
-  const [result, setResult] = useState(["no result"]);
+  const [result, setResult] = useState([]);
   return (
     <div className="App">
       hackathon project
-      <div>
-      {result}
-      <MyMap/>
-      </div>  
+        <div>
+          <MyMap/>
+          <ResultList resultState={result}/>
+        </div>  
       <Form setState={setResult}/>
-      {/* <button onClick={getResult(setResult, req)} style={{margin:'20px'}}>
-        get result
-      </button> */}
     </div>
   );
 }

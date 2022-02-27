@@ -6,22 +6,23 @@ import moment from 'moment'
 import axios from 'axios';
 
 
-function getFormData(object) {
+const getFormData = (obj) => {
     const formData = new FormData();
-    Object.keys(object).forEach(key => formData.append(key, object[key]));
+    Object.keys(obj).forEach(key => formData.append(key, obj[key]));
     return formData;
 }
 
 const getResult = (setState, req) => async() => {
     try{
         console.log("request sent");
-        const { data } = await axios({
+        const { res } = await axios({
             method: 'post',
             url: 'http://localhost:9090/trip/plan_trip.do',
             data: getFormData(req)
           });
-        console.log("response received: ", data);
-        setState(data);
+        console.log("response received: ", res);
+        setState(res.data);
+        console.log(res.data)
     } catch (error) {
         console.log(error)
     }
